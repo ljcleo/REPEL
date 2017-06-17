@@ -1,0 +1,3 @@
+﻿The REPE Language (REPEL)
+
+New Script Language based on C#, developed by and for C#, with features from other popular languages added.
