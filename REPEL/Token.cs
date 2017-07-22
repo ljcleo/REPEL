@@ -25,23 +25,23 @@
 
         public virtual long IntegerValue
         {
-            get { throw new InternalException("not integer token"); }
-            protected set { throw new InternalException("not integer token"); }
+            get => throw new InternalException("not integer token");
+            protected set => throw new InternalException("not integer token");
         }
 
         public virtual double FloatValue
         {
-            get { throw new InternalException("not float token"); }
-            protected set { throw new InternalException("not float token"); }
+            get => throw new InternalException("not float token");
+            protected set => throw new InternalException("not float token");
         }
 
         public virtual string Text
         {
-            get { return ""; }
-            protected set { throw new InternalException("not string or identifier token"); }
+            get => "";
+            protected set => throw new InternalException("not string or identifier token");
         }
 
-        protected Token(int line) { _line = line; }
+        protected Token(int line) => _line = line;
 
         public override string ToString() => Text;
     }

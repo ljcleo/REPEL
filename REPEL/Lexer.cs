@@ -12,7 +12,7 @@ namespace REPEL
         private int _currentLine = 0;
         private bool _eof = false;
 
-        public Lexer(TextReader reader) { _reader = reader; }
+        public Lexer(TextReader reader) => _reader = reader;
 
         public Token Read()
         {

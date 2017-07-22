@@ -44,16 +44,51 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArgumentNode.cs" />
+    <Compile Include="ASTBranch.cs" />
+    <Compile Include="ASTLeaf.cs" />
+    <Compile Include="BaseClassNode.cs" />
+    <Compile Include="BlockNode.cs" />
+    <Compile Include="ByteListNode.cs" />
+    <Compile Include="CaseNode.cs" />
+    <Compile Include="ClassBodyNode.cs" />
+    <Compile Include="ClassNode.cs" />
+    <Compile Include="ControlNode.cs" />
+    <Compile Include="DictionaryNode.cs" />
+    <Compile Include="DoWhileNode.cs" />
     <Compile Include="Environment.cs" />
+    <Compile Include="ExpressionNode.cs" />
+    <Compile Include="FactorNode.cs" />
+    <Compile Include="FloatNode.cs" />
+    <Compile Include="ForNode.cs" />
+    <Compile Include="FunctionNode.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="GuardNode.cs" />
     <Compile Include="IASTNode.cs" />
+    <Compile Include="IfNode.cs" />
+    <Compile Include="ImportNode.cs" />
+    <Compile Include="IntegerNode.cs" />
     <Compile Include="InternalException.cs" />
+    <Compile Include="LambdaNode.cs" />
     <Compile Include="Lexer.cs" />
     <Compile Include="LexicalAutomaton.cs" />
+    <Compile Include="ListNode.cs" />
+    <Compile Include="MemberNode.cs" />
+    <Compile Include="NameNode.cs" />
+    <Compile Include="NullNode.cs" />
+    <Compile Include="PairNode.cs" />
+    <Compile Include="ParameterNode.cs" />
     <Compile Include="ParseException.cs" />
+    <Compile Include="PostfixNode.cs" />
+    <Compile Include="PrimaryNode.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReferenceNode.cs" />
+    <Compile Include="SliceNode.cs" />
+    <Compile Include="StringNode.cs" />
     <Compile Include="Token.cs" />
+    <Compile Include="TupleNode.cs" />
+    <Compile Include="WhileNode.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

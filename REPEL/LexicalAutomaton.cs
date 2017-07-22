@@ -29,14 +29,16 @@ namespace REPEL
 
         private static readonly List<string> _longOperators = new List<string>()
         {
+            "*...",
             "**=", "<<=", ">>=", "&&=", "||=",
-            "===",
+            "...",
             "++", "--",
             "**",
             "<<", ">>",
             "==", "!=", "<=", ">=",
             "&&", "||",
-            "*=", "/=", "\\=", "%=", "+=", "-=", "&=", "|=", "^="
+            "*=", "/=", "\\=", "%=", "+=", "-=", "&=", "|=", "^=",
+            "[*", "*]", "/\\", "!is", "!in"
         };
         
         public static Collection<Token> Match(int currentLine, string parseString, out string leftString)
@@ -342,7 +344,7 @@ namespace REPEL
 
             public override string Text => IntegerValue.ToString(CultureInfo.CurrentCulture);
 
-            public IntegerToken(int line, long value) : base(line) { IntegerValue = value; }
+            public IntegerToken(int line, long value) : base(line) => IntegerValue = value;
         }
 
         private sealed class FloatToken : Token
@@ -353,7 +355,7 @@ namespace REPEL
 
             public override string Text => FloatValue.ToString(CultureInfo.CurrentCulture);
 
-            public FloatToken(int line, double value) : base(line) { FloatValue = value; }
+            public FloatToken(int line, double value) : base(line) => FloatValue = value;
         }
 
         private sealed class StringToken : Token
@@ -362,7 +364,7 @@ namespace REPEL
 
             public override string Text { get; protected set; }
 
-            public StringToken(int line, string text) : base(line) { Text = text; }
+            public StringToken(int line, string text) : base(line) => Text = text;
         }
 
         private sealed class IdentifierToken : Token
@@ -371,7 +373,7 @@ namespace REPEL
 
             public override string Text { get; protected set; }
 
-            public IdentifierToken(int line, string identifier) : base(line) { Text = identifier; }
+            public IdentifierToken(int line, string identifier) : base(line) => Text = identifier;
         }
     }
 }
