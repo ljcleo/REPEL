@@ -9,7 +9,7 @@ namespace REPEL
 
         public MemberNode(Collection<IASTNode> children) : base(children) { }
 
-        public override string ToString() => Name.ToString();
+        public override string ToString() => (Name as ASTLeaf).Token.Text;
 
         public override object Evaluate(Environment env) => throw new NotImplementedException();
     }

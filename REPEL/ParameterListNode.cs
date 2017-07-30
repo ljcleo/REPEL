@@ -4,23 +4,23 @@ using System.Text;
 
 namespace REPEL
 {
-    public class ImportNode : ASTBranch
+    public class ParameterListNode : ASTBranch
     {
-        public ImportNode(Collection<IASTNode> children) : base(children) { }
+        public ParameterListNode(Collection<IASTNode> children) : base(children) { }
 
         public override string ToString()
         {
-            StringBuilder builder = new StringBuilder("(import ");
+            StringBuilder builder = new StringBuilder("(");
 
             string sep = "";
             foreach (var node in this)
             {
                 builder.Append(sep);
-                sep = ".";
+                sep = ",";
                 builder.Append(node.ToString());
             }
 
-            return builder.ToString();
+            return builder.Append(")").ToString();
         }
 
         public override object Evaluate(Environment env) => throw new NotImplementedException();

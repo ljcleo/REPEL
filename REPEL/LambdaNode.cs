@@ -11,8 +11,8 @@ namespace REPEL
 
         public LambdaNode(Collection<IASTNode> children) : base(children) { }
 
-        public override string ToString() => "(/\\ " + Parameters.ToString() + " -> " + Body.ToString();
+        public override string ToString() => "(/\\ " + Parameters.ToString() + Body.ToString();
 
-        public override object Evaluate(Environment env) => throw new NotImplementedException()
+        public override object Evaluate(Environment env) => throw new NotImplementedException();
     }
 }

@@ -1,45 +1,30 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Text;
 
 namespace REPEL
 {
     public class ParameterNode : ASTBranch
     {
-        private bool _hasListParam, _hasDictParam;
+        public int Type { get; protected set; }
 
-        public bool HasListParam => _hasListParam;
+        public IASTNode Name => this[0];
 
-        public bool HasDictParam => _hasDictParam;
+        public IASTNode DefaultValue => this[1];
 
-        public ParameterNode(Collection<IASTNode> children) : this(children, false, false) { }
+        public ParameterNode(Collection<IASTNode> children) : this(children, 0) { }
 
-        public ParameterNode(Collection<IASTNode> children, bool hasListParam, bool hasDictParam) : base(children)
-        {
-            _hasListParam = hasListParam;
-            _hasDictParam = hasDictParam;
-        }
+        public ParameterNode(Collection<IASTNode> children, int type) : base(children) => Type = type;
 
         public override string ToString()
         {
-            StringBuilder builder = new StringBuilder("{");
-
-            string sep = "";
-            for (int i = 0; i < Count; i++)
+            switch (Type)
             {
-                builder.Append(sep);
-                sep = " ";
-
-                builder.Append(this[i].ToString());
-                if (i == Count - 2 && _hasListParam && _hasDictParam) builder.Append("...");
-                else if (i == Count - 1)
-                {
-                    if (_hasDictParam) builder.Append("*...");
-                    else if (_hasListParam) builder.Append("...");
-                }
+                case 0: return Name.ToString() + (DefaultValue is NullNode ? "" : " = " + DefaultValue.ToString());
+                case 1: return Name.ToString() + "...";
+                case 2: return Name.ToString() + (DefaultValue is NullNode ? "" : " = " + DefaultValue.ToString());
+                case 3: return Name.ToString() + "*...";
+                default: throw new InternalException("bad parameter type");
             }
-
-            return builder.Append("}").ToString();
         }
 
         public override object Evaluate(Environment env) => throw new NotImplementedException();

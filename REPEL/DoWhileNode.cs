@@ -11,7 +11,7 @@ namespace REPEL
 
         public DoWhileNode(Collection<IASTNode> children) : base(children) { }
 
-        public override string ToString() => "(do -> " + Body.ToString() + " while " + Condition.ToString();
+        public override string ToString() => "(do " + Body.ToString() + " while " + Condition.ToString();
 
         public override object Evaluate(Environment env) => throw new NotImplementedException();
     }

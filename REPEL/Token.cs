@@ -21,6 +21,8 @@
 
         public virtual bool IsString => false;
 
+        public virtual bool IsName => false;
+
         public virtual bool IsIdentifier => false;
 
         public virtual long IntegerValue

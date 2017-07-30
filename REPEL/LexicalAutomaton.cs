@@ -295,7 +295,7 @@ namespace REPEL
             }
 
             builder.Remove(0, 1);
-            return new IdentifierToken(currentLine, name.ToString());
+            return new NameToken(currentLine, '\'' + name.ToString() + '\'');
         }
 
         private static Token MatchWord(StringBuilder builder, int currentLine)
@@ -309,7 +309,7 @@ namespace REPEL
                 builder.Remove(0, 1);
             }
 
-            return new IdentifierToken(currentLine, word.ToString());
+            return new NameToken(currentLine, word.ToString());
         }
 
         private static Token MatchOperator(StringBuilder builder, int currentLine)
@@ -365,6 +365,17 @@ namespace REPEL
             public override string Text { get; protected set; }
 
             public StringToken(int line, string text) : base(line) => Text = text;
+        }
+
+        private sealed class NameToken : Token
+        {
+            public override bool IsName => true;
+
+            public override bool IsIdentifier => true;
+
+            public override string Text { get; protected set; }
+
+            public NameToken(int line, string identifier) : base(line) => Text = identifier;
         }
 
         private sealed class IdentifierToken : Token
