@@ -32,13 +32,14 @@ namespace REPEL
             "*...",
             "**=", "<<=", ">>=", "&&=", "||=",
             "...",
+            "..",
             "++", "--",
             "**",
             "<<", ">>",
             "==", "!=", "<=", ">=",
             "&&", "||",
             "*=", "/=", "\\=", "%=", "+=", "-=", "&=", "|=", "^=",
-            "[*", "*]", "/\\", "!is", "!in"
+            "[*", "*]", "<*", "*>", "/\\", "!is", "!in"
         };
         
         public static Collection<Token> Match(int currentLine, string parseString, out string leftString)

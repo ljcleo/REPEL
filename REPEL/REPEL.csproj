@@ -99,6 +99,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="repel.bnf" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

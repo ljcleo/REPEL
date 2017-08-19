@@ -20,7 +20,7 @@ namespace REPEL
                 builder.Append(node.ToString());
             }
 
-            return builder.ToString();
+            return builder.Append(")").ToString();
         }
 
         public override object Evaluate(Environment env) => throw new NotImplementedException();

@@ -13,7 +13,7 @@ namespace REPEL
 
         public ClassNode(Collection<IASTNode> children) : base(children) { }
 
-        public override string ToString() => "(class " + Name.ToString() + " : " + BaseClasses.ToString() + Body.ToString();
+        public override string ToString() => "(class " + Name.ToString() + " : " + BaseClasses.ToString() + " " + Body.ToString();
 
         public override object Evaluate(Environment env) => throw new NotImplementedException();
     }

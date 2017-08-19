@@ -55,12 +55,12 @@ namespace REPEL
         {
             if (IsNext(lexer, _ending, skip: true)) return new NullNode(new Collection<IASTNode>());
 
-            IASTNode main = Main(lexer);
+            IASTNode main = MainLine(lexer);
             Skip(lexer, _ending);
             return main;
         }
 
-        private static IASTNode Main(Lexer lexer)
+        private static IASTNode MainLine(Lexer lexer)
         {
             if (IsNext(lexer, "import", skip: true))
             {
@@ -111,9 +111,10 @@ namespace REPEL
 
         private static IASTNode ClassBody(Lexer lexer)
         {
+            Skip(lexer, ":");
             Collection<IASTNode> statements = new Collection<IASTNode>();
 
-            for (Skip(lexer, ":"); !IsNext(lexer, ".", skip: true);)
+            for (SkipEOL(lexer); !IsNext(lexer, "..", skip: true); SkipEOL(lexer))
             {
                 if (IsNext(lexer, "class")) statements.Add(ClassDefinition(lexer));
                 else if (IsNext(lexer, "func")) statements.Add(FunctionDefinition(lexer));
@@ -146,7 +147,7 @@ namespace REPEL
                     parameters.Add(new ParameterNode(new Collection<IASTNode>() { name, new NullNode(new Collection<IASTNode>()) }, 1));
                     state = 2;
                 }
-                else if (IsNext(lexer, "*..."))
+                else if (IsNext(lexer, "*...", skip: true))
                 {
                     parameters.Add(new ParameterNode(new Collection<IASTNode>() { name, new NullNode(new Collection<IASTNode>()) }, 3));
                     Skip(lexer, ")");
@@ -159,8 +160,10 @@ namespace REPEL
                     else if (state == 1) throw new ParseException((name as ASTLeaf).Token);
 
                     parameters.Add(new ParameterNode(new Collection<IASTNode>() { name, value }, state == 2 ? 2 : 0));
-                    state = 1;
+                    if (state == 0 && !(value is NullNode)) state = 1;
                 }
+
+                if (!IsNext(lexer, ")")) Skip(lexer, ",");
             }
 
             return new ParameterListNode(parameters);
@@ -183,7 +186,7 @@ namespace REPEL
             Collection<IASTNode> nodes = new Collection<IASTNode>() { BlockStatement(lexer) };
             Skip(lexer, "while");
             nodes.Add(Expression(lexer));
-            Skip(lexer, ".");
+            Skip(lexer, "..");
 
             return new DoWhileNode(nodes);
         }
@@ -204,12 +207,12 @@ namespace REPEL
             Collection<IASTNode> guards = new Collection<IASTNode>() { Expression(lexer) };
             Skip(lexer, "of");
 
-            while (!IsNext(lexer, ".", skip: true))
+            for (SkipEOL(lexer); !IsNext(lexer, "..", skip: true); SkipEOL(lexer))
             {
                 if (IsNext(lexer, "st", skip: true)) guards.Add(new GuardNode(new Collection<IASTNode>() { Expression(lexer), BlockStatement(lexer) }, 0));
-                if (IsNext(lexer, "eq", skip: true)) guards.Add(new GuardNode(new Collection<IASTNode>() { Expression(lexer), BlockStatement(lexer) }, 1));
-                if (IsNext(lexer, "in", skip: true)) guards.Add(new GuardNode(new Collection<IASTNode>() { Expression(lexer), BlockStatement(lexer) }, 2));
-                if (IsNext(lexer, "else", skip: true)) guards.Add(new GuardNode(new Collection<IASTNode>() { new NullNode(new Collection<IASTNode>()), BlockStatement(lexer) }, 3));
+                else if (IsNext(lexer, "eq", skip: true)) guards.Add(new GuardNode(new Collection<IASTNode>() { Expression(lexer), BlockStatement(lexer) }, 1));
+                else if (IsNext(lexer, "in", skip: true)) guards.Add(new GuardNode(new Collection<IASTNode>() { Expression(lexer), BlockStatement(lexer) }, 2));
+                else if (IsNext(lexer, "else", skip: true)) guards.Add(new GuardNode(new Collection<IASTNode>() { new NullNode(new Collection<IASTNode>()), BlockStatement(lexer) }, 3));
                 else throw new ParseException(lexer.Read());
             }
             
@@ -221,7 +224,7 @@ namespace REPEL
             Skip(lexer, "if");
             Collection<IASTNode> guards = new Collection<IASTNode>();
 
-            while (!IsNext(lexer, ".", skip: true))
+            for (SkipEOL(lexer); !IsNext(lexer, "..", skip: true); SkipEOL(lexer))
             {
                 if (IsNext(lexer, "else", skip: true)) guards.Add(new GuardNode(new Collection<IASTNode>() { new NullNode(new Collection<IASTNode>()), BlockStatement(lexer) }, 3));
                 else guards.Add(new GuardNode(new Collection<IASTNode>() { Expression(lexer), BlockStatement(lexer) }, 0));
@@ -235,11 +238,12 @@ namespace REPEL
             Skip(lexer, ":");
             Collection<IASTNode> block = new Collection<IASTNode>();
 
-            while (!IsNext(lexer, ".", skip: true))
+            for (SkipEOL(lexer); !IsNext(lexer, "..", skip: true); SkipEOL(lexer))
             {
                 if (IsNext(lexer, _ending, skip: true)) continue;
 
                 block.Add(Statement(lexer));
+                if (IsNext(lexer, "..", skip: true)) break;
                 Skip(lexer, _ending);
             }
 
@@ -288,7 +292,7 @@ namespace REPEL
             }
             else if (IsNext(lexer, "[")) primary.Add(List(lexer));
             else if (IsNext(lexer, "[*")) primary.Add(Tuple(lexer));
-            else if (IsNext(lexer, "<")) primary.Add(ByteList(lexer));
+            else if (IsNext(lexer, "<*")) primary.Add(ByteList(lexer));
             else if (IsNext(lexer, "{")) primary.Add(Dictionary(lexer));
             else
             {
@@ -296,7 +300,8 @@ namespace REPEL
                 if (next.IsInteger) primary.Add(new IntegerNode(next));
                 else if (next.IsFloat) primary.Add(new FloatNode(next));
                 else if (next.IsString) primary.Add(new StringNode(next));
-                else primary.Add(Name(lexer));
+                else if (next.IsName) primary.Add(new NameNode(next));
+                else throw new InternalException("no such primary type");
             }
 
             while (IsNext(lexer, _suffix))
@@ -340,10 +345,10 @@ namespace REPEL
         {
             Collection<IASTNode> bytes = new Collection<IASTNode>();
 
-            for (Skip(lexer, "<"); !IsNext(lexer, ">", skip: true);)
+            for (Skip(lexer, "<*"); !IsNext(lexer, "*>", skip: true);)
             {
                 bytes.Add(Range(lexer));
-                if (!IsNext(lexer, ">")) Skip(lexer, ",");
+                if (!IsNext(lexer, "*>")) Skip(lexer, ",");
             }
 
             return new ByteListNode(bytes);
@@ -381,6 +386,8 @@ namespace REPEL
                     key = true;
                 }
                 else arguments.Add(Expression(lexer));
+
+                if (!IsNext(lexer, ")")) Skip(lexer, ",");
             }
 
             return new ArgumentNode(arguments);
@@ -473,6 +480,8 @@ namespace REPEL
             if (!next.IsIdentifier || !set.Contains(next.Text)) throw new ParseException(next);
         }
 
+        private static void SkipEOL(Lexer lexer) { while (IsNext(lexer, Token.EOL, skip: true)) ; }
+
         private static bool IsNext(Lexer lexer, string name, bool skip = false, int count = 0)
         {
             Token next = lexer.Peek(count);
@@ -504,7 +513,7 @@ namespace REPEL
             return new ExpressionNode(new Collection<IASTNode>() { left, op, right });
         }
 
-        private static bool RightFirst(int level, Precedence next) => level < next.Level || level == next.Level && !next.IsLeft;
+        private static bool RightFirst(int level, Precedence next) => level > next.Level || (level == next.Level && !next.IsLeft);
 
         private static Precedence NextOperator(Lexer lexer)
         {
@@ -518,10 +527,16 @@ namespace REPEL
 
             public bool IsLeft { get; protected set; }
 
+            public Precedence()
+            {
+                Level = 99;
+                IsLeft = true;
+            }
+
             public Precedence(int level, bool isLeft)
             {
                 Level = level;
-                IsLeft = IsLeft;
+                IsLeft = isLeft;
             }
         }
     }

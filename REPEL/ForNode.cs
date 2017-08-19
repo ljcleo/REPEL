@@ -13,7 +13,7 @@ namespace REPEL
 
         public ForNode(Collection<IASTNode> children) : base(children) { }
 
-        public override string ToString() => "for " + Variable.ToString() + " in " + Range.ToString() + Body.ToString();
+        public override string ToString() => "(for " + Variable.ToString() + " in " + Range.ToString() + " " + Body.ToString() + ")";
 
         public override object Evaluate(Environment env) => throw new NotImplementedException();
     }

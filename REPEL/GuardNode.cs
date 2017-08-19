@@ -27,7 +27,7 @@ namespace REPEL
             }
         }
 
-        public override string ToString() => "(" + GetTypeString() + (Condition is NullNode ? "" : Condition.ToString()) + Body.ToString() + ")";
+        public override string ToString() => "(" + GetTypeString() + (Condition is NullNode ? "" : Condition.ToString()) + " " + Body.ToString() + ")";
 
         public override object Evaluate(Environment env) => throw new NotImplementedException();
     }

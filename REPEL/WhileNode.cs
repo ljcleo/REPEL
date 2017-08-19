@@ -11,7 +11,7 @@ namespace REPEL
 
         public WhileNode(Collection<IASTNode> children) : base(children) { }
 
-        public override string ToString() => "(while " + Condition.ToString() + Body.ToString();
+        public override string ToString() => "(while " + Condition.ToString() + " " + Body.ToString() + ")";
 
         public override object Evaluate(Environment env) => throw new NotImplementedException();
     }
