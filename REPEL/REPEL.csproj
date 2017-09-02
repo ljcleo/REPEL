@@ -65,6 +65,7 @@
     <Compile Include="FloatNode.cs" />
     <Compile Include="ForNode.cs" />
     <Compile Include="FunctionNode.cs" />
+    <Compile Include="GlobalEnvironment.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="GuardNode.cs" />
     <Compile Include="IASTNode.cs" />
@@ -92,6 +93,7 @@
     <Compile Include="ReferenceNode.cs" />
     <Compile Include="SliceNode.cs" />
     <Compile Include="StringNode.cs" />
+    <Compile Include="Symbols.cs" />
     <Compile Include="SyntacticAutomaton.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="TupleNode.cs" />
