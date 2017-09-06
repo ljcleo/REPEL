@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace REPEL
 {
     [Serializable]
-    internal class InternalException : InvalidOperationException
+    public class InternalException : InvalidOperationException
     {
         public InternalException() { }
 

@@ -193,12 +193,11 @@ namespace REPEL
 
         private static IASTNode WhileStatement(Lexer lexer)
         {
-            Skip(lexer, "do");
-            Collection<IASTNode> nodes = new Collection<IASTNode>() { Expression(lexer) };
             Skip(lexer, "while");
+            Collection<IASTNode> nodes = new Collection<IASTNode>() { Expression(lexer) };
             nodes.Add(BlockStatement(lexer));
 
-            return new DoWhileNode(nodes);
+            return new WhileNode(nodes);
         }
 
         private static IASTNode CaseStatement(Lexer lexer)
@@ -215,7 +214,7 @@ namespace REPEL
                 else if (IsNext(lexer, "else", skip: true)) guards.Add(new GuardNode(new Collection<IASTNode>() { new NullNode(new Collection<IASTNode>()), BlockStatement(lexer) }, 3));
                 else throw new ParseException(lexer.Read());
             }
-            
+
             return new CaseNode(guards);
         }
 
@@ -254,7 +253,7 @@ namespace REPEL
         {
             if (IsNext(lexer, "break", skip: true)) return new ControlNode(new Collection<IASTNode>() { new NullNode(new Collection<IASTNode>()) }, 0);
             else if (IsNext(lexer, "continue", skip: true)) return new ControlNode(new Collection<IASTNode>() { new NullNode(new Collection<IASTNode>()) }, 1);
-            else if (IsNext(lexer, "return", skip: true)) return IsNext(lexer, _ending) ? new ControlNode(new Collection<IASTNode>() { new NullNode(new Collection<IASTNode>()) }, 2) : new ControlNode(new Collection<IASTNode>() { Expression(lexer) }, 0);
+            else if (IsNext(lexer, "return", skip: true)) return IsNext(lexer, _ending) ? new ControlNode(new Collection<IASTNode>() { new NullNode(new Collection<IASTNode>()) }, 2) : new ControlNode(new Collection<IASTNode>() { Expression(lexer) }, 2);
             else return Expression(lexer);
         }
 
@@ -324,7 +323,7 @@ namespace REPEL
                 list.Add(Range(lexer));
                 if (!IsNext(lexer, "]")) Skip(lexer, ",");
             }
-            
+
             return new ListNode(list);
         }
 
@@ -508,7 +507,7 @@ namespace REPEL
         {
             ASTLeaf op = new ASTLeaf(lexer.Read());
             IASTNode right = Factor(lexer);
-            
+
             for (Precedence next; (next = NextOperator(lexer)) != null && RightFirst(level, next); right = Shift(lexer, right, next.Level)) ;
             return new ExpressionNode(new Collection<IASTNode>() { left, op, right });
         }

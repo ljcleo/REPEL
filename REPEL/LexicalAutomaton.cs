@@ -59,7 +59,12 @@ namespace REPEL
 
                     if (builder[0] == '/')
                     {
-                        if (builder[1] == '/') return tokens;
+                        if (builder[1] == '/')
+						{
+						    leftString = "";
+						    tokens.Add(new IdentifierToken(currentLine, Token.EOL));
+							return tokens;
+						}
                         else if (builder[1] == '*')
                         {
                             MatchComment(builder, out leftString);

@@ -6,6 +6,8 @@ namespace REPEL
     {
         public static void Main()
         {
+            Console.WriteLine("Write your scirpt here and get syntactic analyze results");
+            Console.WriteLine("-----------------------------");
             DateTime start = DateTime.Now;
 
             Lexer lexer = new Lexer(Console.In);
@@ -24,8 +26,12 @@ namespace REPEL
         {
             for (IASTNode t; lexer.Peek(0) != Token.EOF;)
             {
-                t = parser.Parse();
-                Console.WriteLine("=> " + t.ToString());
+                try
+                {
+                    t = parser.Parse();
+                    Console.WriteLine("=> " + t.ToString());
+                }
+                catch (Exception e) { Console.WriteLine(e.Message); }
             }
         }
     }

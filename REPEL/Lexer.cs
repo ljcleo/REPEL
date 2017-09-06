@@ -48,7 +48,7 @@ namespace REPEL
 
             ++_currentLine;
             try { _tokens.AddRange(LexicalAutomaton.Match(_currentLine, _leftString + "\n" + _parseString, out _leftString)); }
-            catch (ParseException e) { throw new ParseException(e.Message.Length == 0 ? "bad token" : e.Message + " at line " + _currentLine); }
+            catch (ParseException e) { throw new ParseException((e.Message.Length == 0 ? "bad token" : e.Message) + " at line " + _currentLine); }
         }
     }
 }

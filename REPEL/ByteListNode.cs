@@ -10,7 +10,7 @@ namespace REPEL
 
         public override string ToString()
         {
-            StringBuilder builder = new StringBuilder("<");
+            StringBuilder builder = new StringBuilder("<*");
 
             string sep = "";
             foreach (var node in this)
@@ -20,7 +20,7 @@ namespace REPEL
                 builder.Append(node.ToString());
             }
 
-            return builder.Append(">").ToString();
+            return builder.Append("*>").ToString();
         }
 
         public override object Evaluate(Environment env) => throw new NotImplementedException();
