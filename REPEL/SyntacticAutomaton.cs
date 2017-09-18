@@ -214,7 +214,7 @@ namespace REPEL
                 else if (IsNext(lexer, "else", skip: true)) guards.Add(new GuardNode(new Collection<IASTNode>() { new NullNode(new Collection<IASTNode>()), BlockStatement(lexer) }, 3));
                 else throw new ParseException(lexer.Read());
             }
-
+            
             return new CaseNode(guards);
         }
 
@@ -323,7 +323,7 @@ namespace REPEL
                 list.Add(Range(lexer));
                 if (!IsNext(lexer, "]")) Skip(lexer, ",");
             }
-
+            
             return new ListNode(list);
         }
 
@@ -419,6 +419,13 @@ namespace REPEL
             {
                 Collection<IASTNode> slice = new Collection<IASTNode>() { new NullNode(new Collection<IASTNode>()) };
 
+                if (IsNext(lexer, _sliced))
+                {
+                    slice.Add(new NullNode(new Collection<IASTNode>()));
+                    slice.Add(new NullNode(new Collection<IASTNode>()));
+                    return new SliceNode(slice);
+                }
+
                 if (IsNext(lexer, ":", skip: true)) slice.Add(new NullNode(new Collection<IASTNode>()));
                 else
                 {
@@ -438,6 +445,13 @@ namespace REPEL
             if (!IsNext(lexer, ":", skip: true)) return start;
 
             Collection<IASTNode> slicee = new Collection<IASTNode>() { start };
+
+            if (IsNext(lexer, _sliced))
+            {
+                slicee.Add(new NullNode(new Collection<IASTNode>()));
+                slicee.Add(new NullNode(new Collection<IASTNode>()));
+                return new SliceNode(slicee);
+            }
 
             if (IsNext(lexer, ":", skip: true)) slicee.Add(new NullNode(new Collection<IASTNode>()));
             else
@@ -507,7 +521,7 @@ namespace REPEL
         {
             ASTLeaf op = new ASTLeaf(lexer.Read());
             IASTNode right = Factor(lexer);
-
+            
             for (Precedence next; (next = NextOperator(lexer)) != null && RightFirst(level, next); right = Shift(lexer, right, next.Level)) ;
             return new ExpressionNode(new Collection<IASTNode>() { left, op, right });
         }
