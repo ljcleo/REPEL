@@ -206,7 +206,7 @@ namespace REPEL
 
             for (bool escape = false; builder[0] != '"';)
             {
-                if (builder[0] == '\\')
+                if (!escape && builder[0] == '\\')
                 {
                     escape = true;
                     builder.Remove(0, 1);
@@ -241,7 +241,7 @@ namespace REPEL
                         convertString.Append((char)unicode);
                         builder.Remove(0, 4);
                     }
-                    else throw new ParseException("bad escape char");
+                    else throw new ParseException("bad escape char '" + builder[0] + "'");
 
                     escape = false;
                 }

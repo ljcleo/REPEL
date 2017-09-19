@@ -24,12 +24,17 @@ namespace REPEL
 
         private static void SyntaticAnalyze(Lexer lexer, Parser parser)
         {
-            for (IASTNode t; lexer.Peek(0) != Token.EOF;)
+            while (true)
             {
                 try
                 {
-                    t = parser.Parse();
-                    Console.WriteLine("=> " + t.ToString());
+                    for (IASTNode t; lexer.Peek(0) != Token.EOF;)
+                    {
+                        t = parser.Parse();
+                        Console.WriteLine("=> " + t.ToString());
+                    }
+
+                    break;
                 }
                 catch (Exception e) { Console.WriteLine(e.Message); }
             }
