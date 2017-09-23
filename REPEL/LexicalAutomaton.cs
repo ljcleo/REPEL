@@ -204,7 +204,7 @@ namespace REPEL
             builder.Remove(0, 1);
             StringBuilder convertString = new StringBuilder();
 
-            for (bool escape = false; builder[0] != '"';)
+            for (bool escape = false; escape || builder[0] != '"';)
             {
                 if (!escape && builder[0] == '\\')
                 {

@@ -176,6 +176,7 @@ namespace REPEL
             Skip(lexer, "in");
             nodes.Add(Expression(lexer));
 
+            SkipEOL(lexer);
             nodes.Add(BlockStatement(lexer));
             return new ForNode(nodes);
         }
@@ -183,7 +184,10 @@ namespace REPEL
         private static IASTNode DoWhileStatement(Lexer lexer)
         {
             Skip(lexer, "do");
+            SkipEOL(lexer);
             Collection<IASTNode> nodes = new Collection<IASTNode>() { BlockStatement(lexer) };
+
+            SkipEOL(lexer);
             Skip(lexer, "while");
             nodes.Add(Expression(lexer));
             Skip(lexer, "..");
@@ -195,6 +199,7 @@ namespace REPEL
         {
             Skip(lexer, "while");
             Collection<IASTNode> nodes = new Collection<IASTNode>() { Expression(lexer) };
+            SkipEOL(lexer);
             nodes.Add(BlockStatement(lexer));
 
             return new WhileNode(nodes);
@@ -253,7 +258,7 @@ namespace REPEL
         {
             if (IsNext(lexer, "break", skip: true)) return new ControlNode(new Collection<IASTNode>() { new NullNode(new Collection<IASTNode>()) }, 0);
             else if (IsNext(lexer, "continue", skip: true)) return new ControlNode(new Collection<IASTNode>() { new NullNode(new Collection<IASTNode>()) }, 1);
-            else if (IsNext(lexer, "return", skip: true)) return IsNext(lexer, _ending) ? new ControlNode(new Collection<IASTNode>() { new NullNode(new Collection<IASTNode>()) }, 2) : new ControlNode(new Collection<IASTNode>() { Expression(lexer) }, 2);
+            else if (IsNext(lexer, "return", skip: true)) return IsNext(lexer, _ending) || IsNext(lexer, "..") ? new ControlNode(new Collection<IASTNode>() { new NullNode(new Collection<IASTNode>()) }, 2) : new ControlNode(new Collection<IASTNode>() { Expression(lexer) }, 2);
             else return Expression(lexer);
         }
 
@@ -379,7 +384,7 @@ namespace REPEL
 
             for (Skip(lexer, "("); !IsNext(lexer, ")", skip: true);)
             {
-                if (key || IsNext(lexer, ":", skip: true, count: 1))
+                if (key || IsNext(lexer, ":", count: 1))
                 {
                     arguments.Add(Pair(lexer, arg: true));
                     key = true;
