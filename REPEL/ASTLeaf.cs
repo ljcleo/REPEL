@@ -23,6 +23,8 @@ namespace REPEL
 
         public string Location => "at line " + _token.Line;
 
+        public virtual void Lookup(Symbols sym) { }
+
         public virtual object Evaluate(Environment env) => throw new InternalException("cannot evaluate: " + ToString(), this);
 
         public IEnumerator<IASTNode> GetEnumerator() => Children;

@@ -73,6 +73,7 @@
     <Compile Include="ImportNode.cs" />
     <Compile Include="IntegerNode.cs" />
     <Compile Include="InternalException.cs" />
+    <Compile Include="InterpretException.cs" />
     <Compile Include="LambdaNode.cs" />
     <Compile Include="Lexer.cs" />
     <Compile Include="LexicalAutomaton.cs" />

@@ -15,7 +15,7 @@
             _outer = outer;
         }
 
-        public object GetValue(int nest, int index) => nest == 0 ? _values[index] : (_outer == null ? null : _outer.GetValue(nest - 1, index));
+        public object GetValue(int nest, int index) => nest == 0 ? _values[index] : (_outer?.GetValue(nest - 1, index));
 
         public object GetValue(string name) => throw new InternalException("cannot access by name");
 

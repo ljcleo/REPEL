@@ -43,6 +43,8 @@ namespace REPEL
             }
         }
 
+        public virtual void Lookup(Symbols sym) { foreach (var node in this) node.Lookup(sym); }
+
         public virtual object Evaluate(Environment env) => throw new InternalException("cannot evaluate: " + ToString(), this);
 
         public IEnumerator<IASTNode> GetEnumerator() => Children;

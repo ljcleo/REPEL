@@ -12,6 +12,8 @@ namespace REPEL
 
         string Location { get; }
 
+        void Lookup(Symbols sym);
+
         object Evaluate(Environment env);
     }
 }
