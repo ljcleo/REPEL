@@ -1,12 +1,22 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.16
+VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "REPEL", "REPEL\REPEL.csproj", "{BA4A3DC3-E31D-405D-AF6E-F4386C903467}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A9A3301F-938C-4F4E-B2EA-BE1F3941721A}"
 	ProjectSection(SolutionItems) = preProject
+		REPEL Example Scripts\01integer_float.rep = REPEL Example Scripts\01integer_float.rep
+		REPEL Example Scripts\02string.rep = REPEL Example Scripts\02string.rep
+		REPEL Example Scripts\03var_const_atom.rep = REPEL Example Scripts\03var_const_atom.rep
+		REPEL Example Scripts\04operator.rep = REPEL Example Scripts\04operator.rep
+		REPEL Example Scripts\05list.rep = REPEL Example Scripts\05list.rep
+		REPEL Example Scripts\06other_complex.rep = REPEL Example Scripts\06other_complex.rep
+		REPEL Example Scripts\07sequence_program.rep = REPEL Example Scripts\07sequence_program.rep
+		REPEL Example Scripts\08loop_program.rep = REPEL Example Scripts\08loop_program.rep
+		REPEL Example Scripts\09function.rep = REPEL Example Scripts\09function.rep
+		REPEL Example Scripts\10class.rep = REPEL Example Scripts\10class.rep
 		README = README
 		repel.bnf = repel.bnf
 	EndProjectSection
@@ -24,5 +34,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3E5DBAE6-2ECC-40C6-A37C-90B6379BEAAD}
 	EndGlobalSection
 EndGlobal

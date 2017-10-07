@@ -50,6 +50,7 @@
     <Compile Include="ArgumentNode.cs" />
     <Compile Include="ASTBranch.cs" />
     <Compile Include="ASTLeaf.cs" />
+    <Compile Include="Atom.cs" />
     <Compile Include="BaseClassNode.cs" />
     <Compile Include="BlockNode.cs" />
     <Compile Include="ByteListNode.cs" />

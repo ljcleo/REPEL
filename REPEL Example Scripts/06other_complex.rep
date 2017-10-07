@@ -1,0 +1,49 @@
+import io
+
+a = [*1, 2, 3, 4, 5*]
+print(a, a[0], a[-1], a[1 : 4 : 2])
+print(a + [*6, 7, 8*], a * 3)
+// a += 6 -> Illegal -- Concatenations are possible only between objects of same complex type
+
+// a[2] = 0 -> Illegal -- Tuples are immutable
+// a.append(6) -> Illegal -- Tuples do not support appending
+// del(a[4]) -> Illegal -- Tuples are immutable
+a += [*6, 7, 8*]
+print(a)
+
+a = [1, 2, 3]; b = [*a, a, a[:]*]
+print(a, b)
+b[1][1] = 0
+print(a, b)
+b[2][2] = 0
+print(a, b)
+
+[*a, b*] = [*1, 2*]
+print(a, b)
+[*a, b*] = [*b, a*]
+print(a, b)
+[*_, x*] = [*a, b*]
+print(x)
+
+c = <*10, 248, 0, 209*>
+print(c, c[0], c[-1], c[:])
+print(c + <*192, 168, 1, 1*>, c * 3)
+// c += 6 -> Illegal -- Concatenations are possible only between objects of same complex type
+
+c[4] = 211; print(c)
+del(c[4]); c.append(215); print(c)
+// c[4] = "TH" -> Illegal -- Bytelists can only contain byte integers
+
+d = {0: null, 7: "PCB", 10: "MF", 15: "LLK", "Author": "ZUN"}
+print(d, d[0], d["Author"])
+// print(d[:]) -> Illegal -- Dictionaries do not have slices
+
+print(d + {8: "IN", "Author": "ZUN and you"})
+// print(d * 3) -> Illegal -- Dictionaries cannont multiply
+// d += 6 -> Illegal -- Concatenations are possible only between objects of same complex type
+
+d[0] = false; d.append(8, "IN"); d["Platform"] = ["PC-98", "Windows"]
+print(d)
+del(d["Platform"], d["Author"]); d[[*1, 2, 3*]] = "Old"
+print(d)
+// d[[1, 2, 3]] = "Old" -> Illegal -- Dictionary keys must be immutable

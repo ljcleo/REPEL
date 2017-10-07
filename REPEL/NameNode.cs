@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace REPEL
+﻿namespace REPEL
 {
     public class NameNode : ASTLeaf
     {

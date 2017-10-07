@@ -1,0 +1,37 @@
+import io
+
+a = 1; b = "abc"; c = true; d = null
+print(a, b, c, d)
+del(a, b, c, d)
+// print(a, b, c, d) -> Illegal -- All four variables are deleted and do not exist
+
+x007 = "Knight"
+_210cc = null
+'long var!' = 12345678
+_ = true // Not recommended -- _ is the anonymous variable
+__ = false // Not recommended -- This may confuse others
+print(x007, _210cc, 'long var!', _, __)
+
+
+a = 1
+:
+	^a = 2
+	print(a, @a)
+..
+print(a)
+
+b = &a; print(a, b)
+a = 2; print(a, b)
+
+const(g, 9.8)
+print(g)
+// g = 9.79 -> Illegal -- g is constant
+del(g)
+// print(g) -> Illegal -- g is deleted
+
+atom(USA, CHN, RUS)
+a = USA; b = CHN; c = RUS
+print(a, b, c)
+// USA = 0 -> Illegal -- USA is an atom
+del(USA)
+// print(a) -> Illegal -- USA is deleted and now undefined

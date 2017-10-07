@@ -1,0 +1,14 @@
+import io
+
+a = 123
+b = 00123
+c = 0b10101
+d = 0o73737
+e = 0xfcfcf
+f = 36kREPEL
+g = 123.45
+h = 0123.450
+i = 1.2345e2
+j = 12345E-2
+
+print(a, b, c, d, e, f, g, h, i, j)

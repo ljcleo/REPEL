@@ -1,0 +1,61 @@
+import io
+
+func gcd(a, b):
+	if
+		a < 0 || b < 0: return ..
+		b == 0: return a ..
+		else: return gcd(b, a % b) ..
+	..
+..
+print(gcd(18, 42))
+print(gcd(-1, 2))
+
+func f(a): a += 1 ..
+x = 1; f(x); print(x)
+
+func test(n1, n2 = null, l..., k1, k2 = false, d*...):
+	print(n1, n2, l, k1, k2, d)
+..
+
+// func f(a, b = 2, c) -> Illegal -- Non-default params go before default params
+// func f(a, b..., c*..., d) -> Illegal -- All params go before optional key params
+
+test("GG", k1 : "RKO")
+test(n2 : "MI", n1 : 5, k1 : "ELE", k2 : true)
+test(1, 2, 3, 4, 5, 6, 7, k1 : 8)
+test(1, k1 : 2, k2 : 3, a : 4, b : 5, c : 6, d : 7, e : 8)
+// test(1, 2, 3) -> Illegal -- k1 is not assigned
+// test(k1 : 233) -> Illegal -- n1 is not assigned
+// test(1, k1 : 2, 3) -> Illegal -- Plain args go before key args
+
+func outfc():
+	func infc(x, y):
+		if
+			x > y: return x ** y ..
+			else: return y ** x ..
+		..
+	..
+
+	s = 0
+	for i in [1 : 5]:
+		for j in [1 : 5]:
+			s += infc(i, j)
+		..
+	..
+
+	return s
+..
+print(outfc())
+
+func ctr(x):
+	func t(): x += 1 ..
+	return t
+..
+a = ctr(0); b = ctr(0)
+print(a(), a(), b())
+
+f = /\(x): x * x ..
+for i in [1 : 5]: print(f(i)) ..
+
+g = /\(f, x): len(x) and f(x[0]) + g(f, x[1 : ]) ..
+print(f, [1, 2, 3, 4, 5])

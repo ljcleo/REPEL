@@ -1,0 +1,24 @@
+import io
+
+s = 0; i = 1
+while i < 10:
+	s += i
+	++i
+..
+print(s, i)
+
+s = 0; i = 1
+do:
+	s += i
+	++i
+..
+while i < 10 ..
+print(s, i)
+
+s = 0
+for i in [1 : 100]:
+	if i % 2 == 0: continue .. ..
+	s += i
+	if s > 100: break .. ..
+..
+print(s, i)

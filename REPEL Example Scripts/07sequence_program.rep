@@ -1,0 +1,42 @@
+import io
+import math
+
+s = read()
+
+case s of
+	eq "Easter":
+		print("HELLO WORLD!")
+		exit()
+	..
+	in ["Rick", "Morty"]: print("Welcome!") ..
+	else:
+		print("Boo!")
+		exit()
+	..
+..
+
+[*a, b, c*] = read(float, float, float)
+
+case a of
+	eq 0:
+		if
+			b == 0:
+				if
+					c == 0: print("Infinitive solutions!") ..
+					else: print("No solution!") ..
+				..
+			..
+			else: fprint("x = {0:.4f}", c / b) ..
+		..
+	..
+	else:
+		d = b * b - 4 * a * c
+		q = sqrt(abs(d)) / (a * 2); l = -b / (a * 2)
+		
+		case d of
+			st _ < 0: fprint("x1 = {0:.4f} - {1:.4f}i, x2 = {0:.4f} + {1:.4f}i", l, q) ..
+			eq 0: fprint("x1 = x2 = {0:.4f}", l) ..
+			else: fprint("x1 = {0:.4f}, x2 = {1:.4f}", l - q, l + q) ..
+		..
+	..
+..

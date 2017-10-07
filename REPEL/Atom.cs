@@ -20,6 +20,18 @@ namespace REPEL
 
         public Atom(string text) => _text = text;
 
+        public static bool IsBoolAtom(object obj) => obj is Atom && (obj == AtomTrue || obj == AtomFalse);
+
+        public static Atom GetBoolAtom(bool value) => value ? AtomTrue : AtomFalse;
+
         public override string ToString() => Text;
+
+        public static Atom operator !(Atom atom) => GetBoolAtom(!atom.BoolValue);
+
+        public static Atom operator &(Atom left, Atom right) => GetBoolAtom(left.BoolValue & right.BoolValue);
+
+        public static Atom operator ^(Atom left, Atom right) => GetBoolAtom(left.BoolValue ^ right.BoolValue);
+
+        public static Atom operator |(Atom left, Atom right) => GetBoolAtom(left.BoolValue | right.BoolValue);
     }
 }

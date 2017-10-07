@@ -1,0 +1,49 @@
+import io
+
+class PlainPoint:
+	x = y = 0
+
+	func BaseClass(nx = 0, ny = 0): x = nx; y = ny ..
+	func move(nx, ny): x = nx; y = ny ..
+
+	func pos(): return [*x, y*] ..
+..
+a = PlainPoint(1, 2)
+b = PlainPoint()
+print(a.pos(), b.pos())
+b.move(2, 1); print(b.pos())
+
+class SpacePoint (PlainPoint):
+	z = 0
+
+	func SpacePoint(x = 0, y = 0, z = 0): PlainPoint(x, y); this.z = z ..
+	func move(nx, ny, nz): PlainPoint.move(nx, ny); z = nz ..
+	func pos(): return [*x, y, z*] ..
+..
+c = SpacePoint()
+print(c.pos())
+c.move(1, 2, 3)
+print(c.pos())
+// c.move(1, 2) -> Illegal -- The base method move is overrided by another derived method
+
+atom(red, green, blue)
+
+class ColorPoint (PlainPoint):
+	c = null
+
+	func ColorPoint(x = 0, y = 0, nc = null): PlainPoint(x, y); c = nc ..
+	func color(): return c ..
+..
+d = ColorPoint(1, 2, red)
+print(d.pos(), d.color())
+d.move(2, 1); d.c = green
+print(d.pos(), d.color())
+
+class SpaceColorPoint (SpacePoint, ColorPoint):
+	func SpaceColorPoint(x = 0, y = 0, z = 0, c = null): SpacePoint(x, y, z); ColorPoint(x, y, c) ..
+..
+e = SpaceColorPoint(1, 2, 3, blue)
+print(e.pos(), e.color())
+e.move(3, 2, 1); e.paint(green)
+print(e.pos(), e.color())
+// e.move(0, 0) -> Illegal -- The method move is derived from SpacePoint instead of ColorPoint due to the resolve order

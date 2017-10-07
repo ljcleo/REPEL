@@ -1,0 +1,37 @@
+import io
+
+a = 2
+print(+a, -a, !a, ~a)
+print(++a, a)
+print(--a, a)
+
+b = 3; c = 4
+print(a ** b ** c, (a ** b) ** c)
+print(b + a, b - a, b * a, b / a, b \ a, b % a)
+
+d = 2.5; e = 1.2
+print(d \ e, d % e)
+
+print(a & b, a | b, a ^ b, c << a, c >> a);
+// print(d & e, ~d) -> Illegal -- Bit operators are possible only between integers
+
+s = b * c as string
+print(s[0] + " " + s[1])
+
+print(a == b, a != b, a < b, a <= b, a > b, a >= b)
+
+f = true; g = false
+print(f && g, f || g, f ^ g)
+print(a && b, a || b)
+
+aa = 2.0
+print(a == aa, a is aa, a !is aa)
+
+l = [1 : 5 : 2]
+print(a in l, b in l, c !in l)
+
+z = 0
+print(a and b, z and b, a or b, z or b)
+
+z += a; z *= b; z <<= c
+print(z)
