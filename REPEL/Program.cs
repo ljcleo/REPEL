@@ -6,13 +6,17 @@ namespace REPEL
     {
         public static void Main()
         {
-            Console.WriteLine("Write your scirpt here and get syntactic analyze results");
+            //Console.WriteLine("Write your scirpt here and get syntactic analyze results");
+            Console.WriteLine("Write your script and get interpret result");
             Console.WriteLine("-----------------------------");
             DateTime start = DateTime.Now;
 
             Lexer lexer = new Lexer(Console.In);
             Parser parser = new Parser(lexer);
-            SyntaticAnalyze(lexer, parser);
+
+            GlobalEnvironment env = new GlobalEnvironment();
+            //SyntaticAnalyze(lexer, parser);
+            Interpret(lexer, parser, env);
 
             Console.WriteLine();
             Console.WriteLine("------------------------------");
@@ -36,7 +40,31 @@ namespace REPEL
 
                     break;
                 }
-                catch (Exception e) { Console.WriteLine(e.Message); }
+                catch (Exception e) { Console.WriteLine("E> " + e.Message); }
+            }
+        }
+
+        private static void Interpret(Lexer lexer, Parser parser, GlobalEnvironment env)
+        {
+            while (true)
+            {
+                try
+                {
+                    for (IASTNode t; lexer.Peek(0) != Token.EOF;)
+                    {
+                        t = parser.Parse();
+                        if (!(t is NullNode))
+                        {
+                            t.Lookup(env.Names);
+
+                            object result = t.Evaluate(env);
+                            if (result is string) Console.WriteLine("=> \"" + t + "\"");
+                            else if (result is Atom) Console.WriteLine("=> '" + t + "'");
+                            else Console.WriteLine("=> " + result);
+                        }
+                    }
+                }
+                catch (Exception e) { Console.WriteLine("E> " + e.Message); }
             }
         }
     }

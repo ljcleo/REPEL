@@ -10,9 +10,13 @@
 
         public NameNode(Token token) : base(token) { }
 
-        public override void Lookup(Symbols sym)
+        public override void Lookup(Symbols sym) { Lookup(sym, 0); }
+
+        public void Lookup(Symbols sym, int type)
         {
-            var location = sym.GetLocation(Name);
+            if (type < 0 || type > 2) throw new InternalException("bad name lookup type");
+
+            var location = sym.GetLocation(type, Name);
             if (location == null) throw new InterpretException("undefined name: " + Name, this);
             else
             {
@@ -21,9 +25,11 @@
             }
         }
 
-        public void AssignLookup(Symbols sym)
+        public void AssignLookup(Symbols sym) { AssignLookup(sym, 0); }
+
+        public void AssignLookup(Symbols sym, int type)
         {
-            var location = sym.SetSymbol(Name);
+            var location = sym.SetSymbol(type, Name);
             _nest = location.Nest;
             _index = location.Index;
         }

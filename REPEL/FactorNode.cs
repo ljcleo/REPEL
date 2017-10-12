@@ -15,15 +15,43 @@ namespace REPEL
             { "~", Reverse }
         };
 
-        private static readonly Collection<string> _variablePrefix = new Collection<string>() { "@", "^" };
+        private static readonly Dictionary<string, int> _variablePrefix = new Dictionary<string, int>()
+        {
+            { "@", 1 },
+            { "^", 2 }
+        };
 
         public IASTNode Operand => this[Count - 1];
 
-        public bool IsAssignable => Count == 1 || (Count == 2 && _variablePrefix.Contains((Prefix(0) as ASTLeaf).Token.Text));
+        public bool HasVariablePrefix => Count > 1 && _variablePrefix.ContainsKey((Prefix(0) as ASTLeaf).Token.Text);
+
+        public bool IsAssignable => (Operand as PrimaryNode).IsAssignable && (Count == 1 || (Count == 2 && HasVariablePrefix));
 
         public FactorNode(Collection<IASTNode> children) : base(children) { }
 
         public IASTNode Prefix(int index) => this[Count - index - 2];
+
+        public override void Lookup(Symbols sym)
+        {
+            for (int i = 0; i < Count - 2; i++) if (_variablePrefix.ContainsKey((Prefix(i) as ASTLeaf).Token.Text)) throw new InterpretException("can only use variable prefix before name");
+            
+            if (HasVariablePrefix)
+            {
+                PrimaryNode primary = Operand as PrimaryNode;
+                if (primary != null) primary.Lookup(sym, _variablePrefix[(Prefix(0) as ASTLeaf).Token.Text]);
+                else throw new InternalException("factors must follow primary");
+            }
+            else Operand.Lookup(sym);
+        }
+
+        public void AssignLookup(Symbols sym)
+        {
+            if (!IsAssignable) throw new InterpretException("factor not assignable");
+
+            PrimaryNode primary = Operand as PrimaryNode;
+            if (primary != null) primary.AssignLookup(sym, HasVariablePrefix ? _variablePrefix[(Prefix(0) as ASTLeaf).Token.Text] : 0);
+             else throw new InternalException("factors must follow primary");
+        }
 
         public override string ToString()
         {
@@ -48,6 +76,9 @@ namespace REPEL
             return result;
         }
 
+        public void AssignEvaluate(Environment env, object value)
+        {}
+
         private static object Positive(object obj)
         {
             if (obj == null) throw new ArgumentNullException(nameof(obj));
@@ -69,7 +100,7 @@ namespace REPEL
         private static object Not(object obj)
         {
             if (obj == null) throw new ArgumentNullException(nameof(obj));
-            return Atom.GetBoolAtom(ExpressionNode.GetBoolValue(obj));
+            return !Atom.GetBoolAtom(ExpressionNode.GetBoolValue(obj));
         }
 
         private static object Reverse(object obj)

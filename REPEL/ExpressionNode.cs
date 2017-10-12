@@ -51,6 +51,26 @@ namespace REPEL
             else return true;
         }
 
+        public override void Lookup(Symbols sym)
+        {
+            string current = (Operator as ASTLeaf).Token.Text;
+            if (current[0] == '=')
+            {
+                if (current != "=" && (current == string.Empty || _normalOperator.ContainsKey(current.Substring(0)))) throw new InternalException("bad assign operator parsed");
+
+                FactorNode leftFactor = Left as FactorNode;
+                if (leftFactor == null || !leftFactor.IsAssignable) throw new InterpretException("left part not assignable");
+
+                leftFactor.AssignLookup(sym);
+                Right.Lookup(sym);
+            }
+            else
+            {
+                Left.Lookup(sym);
+                Right.Lookup(sym);
+            }
+        }
+
         public override object Evaluate(Environment env)
         {
             if (env == null) throw new ArgumentNullException(nameof(env));
@@ -59,15 +79,17 @@ namespace REPEL
             if (_normalOperator.ContainsKey(current)) return _normalOperator[current](Left.Evaluate(env), Right.Evaluate(env));
             else if (current[0] == '=')
             {
-                if (!(Left as FactorNode).IsAssignable) throw new InterpretException("left factor not assignable");
+                FactorNode leftFactor = Left as FactorNode;
+                if (leftFactor == null || !leftFactor.IsAssignable) throw new InterpretException("left part not assignable");
 
-                object rvalue = null;
-                if (current == "=") rvalue = Right.Evaluate(env);
-                else if (current.Length > 2 && _normalOperator.ContainsKey(current.Substring(0))) rvalue = _normalOperator[current.Substring(1)](Left.Evaluate(env), Right.Evaluate(env));
+                object rightValue = null;
+                if (current == "=") rightValue = Right.Evaluate(env);
+                else if (current.Length > 2 && _normalOperator.ContainsKey(current.Substring(0))) rightValue = _normalOperator[current.Substring(1)](Left.Evaluate(env), Right.Evaluate(env));
 
-                if (rvalue == null) throw new InternalException("bas assign operator parsed");
+                if (rightValue == null) throw new InternalException("bad assign operator parsed");
+                leftFactor.AssignEvaluate(env, rightValue);
 
-                return rvalue;
+                return rightValue;
             }
             else throw new InternalException("operator '" + current + "' has not been implemented");
         }
@@ -77,13 +99,13 @@ namespace REPEL
             if (left == null) throw new ArgumentNullException(nameof(left));
             if (right == null) throw new ArgumentNullException(nameof(right));
 
-            if (left is long && right is long) return (long)Math.Pow((left as long?).Value, (right as long?).Value);
-            else
-            {
-                double? lf = left as double?, rf = right as double?;
-                if (lf == null || rf == null) throw new InterpretException("bad type for '**'");
-                return Math.Pow(lf.Value, rf.Value);
-            }
+            long? ll = left as long?, rl = right as long?;
+            double? lf = left as double?, rf = right as double?;
+
+            if ((ll == null && lf == null) || (rl == null && rf == null)) throw new InterpretException("bad type for '**'");
+
+            if (ll != null && rl != null) return (long)Math.Pow(ll.Value, rl.Value);
+            else return Math.Pow((ll ?? lf).Value, (rl ?? rf).Value);
         }
 
         private static object Multiply(object left, object right)
@@ -93,7 +115,8 @@ namespace REPEL
 
             if (right is double)
             {
-                if (left is long || left is double) return ((left as double?) * (right as double?)).Value;
+                if (left is long) return ((left as long?) * (right as double?)).Value;
+                else if (left is double) return ((left as double?) * (right as double?)).Value;
                 else throw new InterpretException("bad type for '*'");
             }
             else if (right is long)
@@ -101,7 +124,7 @@ namespace REPEL
                 long rl = (right as long?).Value;
 
                 if (left is long) return ((left as long?) * rl).Value;
-                else if (left is double) return ((left as double?) * (right as double?)).Value;
+                else if (left is double) return ((left as double?) * rl).Value;
                 else if (left is string)
                 {
                     if (rl == 0) return String.Empty;
@@ -120,8 +143,11 @@ namespace REPEL
             if (left == null) throw new ArgumentNullException(nameof(left));
             if (right == null) throw new ArgumentNullException(nameof(right));
 
-            if (!(left is long || left is double) || !(right is long || right is double)) throw new InterpretException("bad type for /");
-            try { return ((left as double?) / (right as double?)).Value; }
+            long? ll = left as long?, rl = right as long?;
+            double? lf = left as double?, rf = right as double?;
+            if ((ll == null && lf == null) || (rl == null && rf == null)) throw new InterpretException("bad type for /");
+            
+            try { return (ll ?? lf).Value * 1.0 / (rl ?? rf).Value; }
             catch (DivideByZeroException) { throw new InterpretException("cannot divide by 0"); }
         }
 
@@ -130,24 +156,31 @@ namespace REPEL
             if (left == null) throw new ArgumentNullException(nameof(left));
             if (right == null) throw new ArgumentNullException(nameof(right));
 
-            if (!(left is long || left is double) || !(right is long || right is double)) throw new InterpretException("bad type for /");
-            try
-            {
-                if (left is long && right is long) return (((left as long?) - (long)Math.IEEERemainder((left as long?).Value, (right as long?).Value)) / (right as long?)).Value;
-                else return (((left as double?) - Math.IEEERemainder((left as double?).Value, (right as double?).Value)) / (right as double?)).Value;
-            }
-            catch (DivideByZeroException) { throw new InterpretException("cannot divide by 0"); }
+            long? ll = left as long?, rl = right as long?;
+            double? lf = left as double?, rf = right as double?;
+            if ((ll == null && lf == null) || (rl == null && rf == null)) throw new InterpretException("bad type for /");
+            
+            double modres = Math.IEEERemainder((ll ?? lf).Value, (rl ?? rf).Value);
+            if (double.IsNaN(modres)) throw new InterpretException("cannot divide by zero");
+
+            if (ll != null && rl != null) return (ll.Value - (long)modres) / rl.Value;
+            else return ((ll ?? lf).Value - modres) / (rl ?? rf).Value;
         }
 
         private static object Modulo(object left, object right)
         {
-            if (!(left is long || left is double) || !(right is long || right is double)) throw new InterpretException("bad type for /");
-            try
-            {
-                if (left is long && right is long) return (long)Math.IEEERemainder((left as long?).Value, (right as long?).Value);
-                else return Math.IEEERemainder((left as double?).Value, (right as double?).Value);
-            }
-            catch (DivideByZeroException) { throw new InterpretException("cannot divide by 0"); }
+            if (left == null) throw new ArgumentNullException(nameof(left));
+            if (right == null) throw new ArgumentNullException(nameof(right));
+
+            long? ll = left as long?, rl = right as long?;
+            double? lf = left as double?, rf = right as double?;
+            if ((ll == null && lf == null) || (rl == null && rf == null)) throw new InterpretException("bad type for /");
+            
+            double modres = Math.IEEERemainder((ll ?? lf).Value, (rl ?? rf).Value);
+            if (double.IsNaN(modres)) throw new InterpretException("cannot modulo by zero");
+
+            if (ll != null && rl != null) return (long)modres;
+            else return modres;
         }
 
         private static object Add(object left, object right)
@@ -155,16 +188,14 @@ namespace REPEL
             if (left == null) throw new ArgumentNullException(nameof(left));
             if (right == null) throw new ArgumentNullException(nameof(right));
 
-            if (left is long)
+            if (left is long || left is double)
             {
-                if (right is long) return ((left as long?) + (right as long?)).Value;
-                else if (right is double) return ((left as double?) + (right as double?)).Value;
-                else throw new InterpretException("bad type for '+'");
-            }
-            else if (left is float)
-            {
-                if (right is long || right is double) return ((left as double?) + (right as double?)).Value;
-                else throw new InterpretException("bad type for '+'");
+                long? ll = left as long?, rl = right as long?;
+                double? lf = left as double?, rf = right as double?;
+                if ((ll == null && lf == null) || (rl == null && rf == null)) throw new InterpretException("bad type for +");
+                
+                if (ll != null && rl != null) return ll.Value + rl.Value;
+                else return (ll ?? lf).Value + (rl ?? rf).Value;
             }
             else if (left is string && right is string) return (left as string) + (right as string);
             else throw new InterpretException("bad type for '+'");
@@ -175,16 +206,14 @@ namespace REPEL
             if (left == null) throw new ArgumentNullException(nameof(left));
             if (right == null) throw new ArgumentNullException(nameof(right));
 
-            if (left is long)
+            if (left is long || left is double)
             {
-                if (right is long) return ((left as long?) - (right as long?)).Value;
-                else if (right is double) return ((left as double?) - (right as double?)).Value;
-                else throw new InterpretException("bad type for '-'");
-            }
-            else if (left is float)
-            {
-                if (right is long || right is double) return ((left as double?) - (right as double?)).Value;
-                else throw new InterpretException("bad type for '-'");
+                long? ll = left as long?, rl = right as long?;
+                double? lf = left as double?, rf = right as double?;
+                if ((ll == null && lf == null) || (rl == null && rf == null)) throw new InterpretException("bad type for -");
+                
+                if (ll != null && rl != null) return ll.Value - rl.Value;
+                else return (ll ?? lf).Value - (rl ?? rf).Value;
             }
             else throw new InterpretException("bad type for '-'");
         }
@@ -195,7 +224,10 @@ namespace REPEL
             if (right == null) throw new ArgumentNullException(nameof(right));
 
             if (!(left is long) || !(right is long)) throw new InterpretException("bad type for '<<'");
-            return (left as long?).Value << (right as int?).Value;
+
+            long rightValue = (right as long?).Value;
+            if (rightValue < 0 || rightValue > int.MaxValue) throw new InterpretException("large shift not supported in this version");
+            return (left as long?).Value << (int)rightValue;
         }
 
         private static object RightShift(object left, object right)
@@ -204,7 +236,10 @@ namespace REPEL
             if (right == null) throw new ArgumentNullException(nameof(right));
 
             if (!(left is long) || !(right is long)) throw new InterpretException("bad type for '<<'");
-            return (left as long?).Value >> (right as int?).Value;
+
+            long rightValue = (right as long?).Value;
+            if (rightValue < 0 || rightValue > int.MaxValue) throw new InterpretException("large shift not supported in this version");
+            return (left as long?).Value >> (int)rightValue;
         }
 
         private static object BitAnd(object left, object right)
@@ -244,7 +279,14 @@ namespace REPEL
 
             bool result = false;
 
-            if (left is long || left is double) result = (left as double?) == (right as double?);
+            if (left is long || left is double)
+            {
+                long? ll = left as long?, rl = right as long?;
+                double? lf = left as double?, rf = right as double?;
+                if ((ll == null && lf == null) || (rl == null && rf == null)) throw new InterpretException("bad type for -");
+                
+                result = (ll ?? lf).Value == (rl ?? rf).Value;
+            }
             else if (left is string) result = (left as string) == (right as string);
             else result = left.Equals(right);
 
@@ -260,7 +302,16 @@ namespace REPEL
 
             bool result = false;
 
-            if ((left is long || left is double) && (right is long || right is double)) result = (left as double?) < (right as double?);
+            
+
+            if (left is long || left is double)
+            {
+                long? ll = left as long?, rl = right as long?;
+                double? lf = left as double?, rf = right as double?;
+                if ((ll == null && lf == null) || (rl == null && rf == null)) throw new InterpretException("bad type for -");
+                
+                result = (ll ?? lf).Value < (rl ?? rf).Value;
+            }
             else if (left is string && right is string) result = (left as string).CompareTo((right as string)) < 0;
             else throw new InterpretException("bad type for <");
 
