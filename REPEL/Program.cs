@@ -58,8 +58,8 @@ namespace REPEL
                             t.Lookup(env.Names);
 
                             object result = t.Evaluate(env);
-                            if (result is string) Console.WriteLine("=> \"" + t + "\"");
-                            else if (result is Atom) Console.WriteLine("=> '" + t + "'");
+                            if (result is string) Console.WriteLine("=> \"" + result + "\"");
+                            else if (result is Atom) Console.WriteLine("=> '" + result + "'");
                             else Console.WriteLine("=> " + result);
                         }
                     }

@@ -31,6 +31,13 @@ namespace REPEL
 
         public IASTNode Prefix(int index) => this[Count - index - 2];
 
+        public override string ToString()
+        {
+            StringBuilder builder = new StringBuilder();
+            foreach (var node in this) builder.Append(node is ASTLeaf ? (node as ASTLeaf).Token.Text : node.ToString());
+            return builder.ToString();
+        }
+
         public override void Lookup(Symbols sym)
         {
             for (int i = 0; i < Count - 2; i++) if (_variablePrefix.ContainsKey((Prefix(i) as ASTLeaf).Token.Text)) throw new InterpretException("can only use variable prefix before name");
@@ -50,14 +57,7 @@ namespace REPEL
 
             PrimaryNode primary = Operand as PrimaryNode;
             if (primary != null) primary.AssignLookup(sym, HasVariablePrefix ? _variablePrefix[(Prefix(0) as ASTLeaf).Token.Text] : 0);
-             else throw new InternalException("factors must follow primary");
-        }
-
-        public override string ToString()
-        {
-            StringBuilder builder = new StringBuilder();
-            foreach (var node in this) builder.Append(node is ASTLeaf ? (node as ASTLeaf).Token.Text : node.ToString());
-            return builder.ToString();
+            else throw new InternalException("factors must follow primary");
         }
 
         public override object Evaluate(Environment env)
@@ -77,7 +77,13 @@ namespace REPEL
         }
 
         public void AssignEvaluate(Environment env, object value)
-        {}
+        {
+            if (!IsAssignable) throw new InterpretException("factor not assignable");
+
+            PrimaryNode primary = Operand as PrimaryNode;
+            if (primary != null) primary.AssignEvaluate(env, value);
+            else throw new InternalException("factors must follow primary");
+        }
 
         private static object Positive(object obj)
         {

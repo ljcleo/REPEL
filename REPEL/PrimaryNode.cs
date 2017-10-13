@@ -21,7 +21,7 @@ namespace REPEL
         {
             if (type < 0 || type > 2) throw new InternalException("bad variable type");
 
-            if (type == 0) (this as ASTBranch).Lookup(sym);
+            if (type == 0) base.Lookup(sym);
             else
             {
                 if (IsAssignable) (Operand as NameNode).Lookup(sym, type);
@@ -40,5 +40,10 @@ namespace REPEL
         }
 
         public override object Evaluate(Environment env) => Operand.Evaluate(env);
+
+        public void AssignEvaluate(Environment env, object value)
+        {
+            if (IsAssignable) (Operand as NameNode).AssignEvaluate(env, value);
+        }
     }
 }
