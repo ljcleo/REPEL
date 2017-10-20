@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 
 namespace REPEL
 {
-    public class CaseNode : ASTBranch
+    public class CaseNode : BlockNode
     {
         public IASTNode TestValue => this[0];
 
@@ -18,6 +17,28 @@ namespace REPEL
             return builder.Append(")").ToString();
         }
 
-        public override object Evaluate(Environment env) => throw new NotImplementedException();
+        public override object Evaluate(Environment env)
+        {
+            Environment inner = new Environment(InnerSymbol.Count, env);
+
+            object left = TestValue.Evaluate(inner);
+            if (InnerSymbol.Contains("_"))
+            {
+                int index = InnerSymbol["_"];
+                env.SetValue(0, index, left);
+            }
+
+            foreach (var node in this)
+            {
+                if (node == TestValue) continue;
+
+                GuardNode guard = node as GuardNode;
+                if (guard == null) throw new InternalException("bad guard");
+
+                if (guard.EvaluateCondition(inner, left)) guard.Evaluate(inner);
+            }
+
+            return Atom.AtomNull;
+        }
     }
 }

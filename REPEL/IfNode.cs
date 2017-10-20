@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Text;
 
 namespace REPEL
 {
-    public class IfNode : ASTBranch
+    public class IfNode : BlockNode
     {
         public IfNode(Collection<IASTNode> children) : base(children) { }
 
@@ -15,6 +14,23 @@ namespace REPEL
             return builder.Append(")").ToString();
         }
 
-        public override object Evaluate(Environment env) => throw new NotImplementedException();
+        public override object Evaluate(Environment env)
+        {
+            Environment inner = new Environment(InnerSymbol.Count, env);
+
+            foreach (var node in this)
+            {
+                GuardNode guard = node as GuardNode;
+                if (guard == null) throw new InternalException("bad guard");
+
+                if (guard.EvaluateCondition(env, null))
+                {
+                    guard.Evaluate(inner);
+                    break;
+                }
+            }
+
+            return Atom.AtomNull;
+        }
     }
 }

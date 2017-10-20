@@ -27,8 +27,29 @@ namespace REPEL
             }
         }
 
+        public bool EvaluateCondition(Environment env, object left)
+        {
+            bool judge = true;
+
+            switch (Type)
+            {
+                case 0:
+                    judge = ExpressionNode.GetBoolValue(Condition.Evaluate(env));
+                    break;
+                case 1:
+                    if (left == null) throw new InterpretException("cannot use 'eq' without left value");
+                    judge = left.Equals(Condition.Evaluate(env));
+                    break;
+                case 2:
+                    if (left == null) throw new InterpretException("cannot use 'in' without left value");
+                    throw new InternalException("'in' not implemented currently");
+            }
+
+            return judge;
+        }
+
         public override string ToString() => "(" + GetTypeString() + (Condition is NullNode ? "" : Condition.ToString()) + " " + Body.ToString() + ")";
 
-        public override object Evaluate(Environment env) => throw new NotImplementedException();
+        public override object Evaluate(Environment env) => Body.Evaluate(env);
     }
 }
