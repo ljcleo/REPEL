@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 
 namespace REPEL
 {
-    public class WhileNode : ASTBranch
+    public class WhileNode : BlockNode
     {
         public IASTNode Condition => this[0];
 
@@ -13,6 +13,11 @@ namespace REPEL
 
         public override string ToString() => "(while " + Condition.ToString() + " " + Body.ToString() + ")";
 
-        public override object Evaluate(Environment env) => throw new NotImplementedException();
+        public override object Evaluate(Environment env)
+        {
+            Environment inner = new Environment(InnerSymbol.Count, env);
+            while (ExpressionNode.GetBoolValue(Condition.Evaluate(inner))) Body.Evaluate(inner);
+            return Atom.AtomNull;
+        }
     }
 }

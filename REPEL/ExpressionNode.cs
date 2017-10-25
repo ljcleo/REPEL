@@ -77,14 +77,14 @@ namespace REPEL
 
             string current = (Operator as ASTLeaf).Token.Text;
             if (_normalOperator.ContainsKey(current)) return _normalOperator[current](Left.Evaluate(env), Right.Evaluate(env));
-            else if (current[0] == '=')
+            else if (current[current.Length - 1] == '=')
             {
                 FactorNode leftFactor = Left as FactorNode;
                 if (leftFactor == null || !leftFactor.IsAssignable) throw new InterpretException("left part not assignable");
 
                 object rightValue = null;
                 if (current == "=") rightValue = Right.Evaluate(env);
-                else if (current.Length > 2 && _normalOperator.ContainsKey(current.Substring(0))) rightValue = _normalOperator[current.Substring(1)](Left.Evaluate(env), Right.Evaluate(env));
+                else if (current.Length > 2 && _normalOperator.ContainsKey(current.Substring(0, current.Length - 1))) rightValue = _normalOperator[current.Substring(0, current.Length - 1)](Left.Evaluate(env), Right.Evaluate(env));
 
                 if (rightValue == null) throw new InternalException("bad assign operator parsed");
                 leftFactor.AssignEvaluate(env, rightValue);
