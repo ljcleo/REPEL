@@ -10,9 +10,12 @@ namespace REPEL
 
         public BlockNode(Collection<IASTNode> children) : base(children) { }
 
-        public override void Lookup(Symbols sym)
+        public override void Lookup(Symbols sym) => Lookup(sym, false);
+
+        public void Lookup(Symbols sym, bool withAnonymous)
         {
             _inner = new Symbols(sym);
+            if (withAnonymous) _inner.SetSymbol(2, "_");
             foreach (var node in this) node.Lookup(_inner);
         }
 

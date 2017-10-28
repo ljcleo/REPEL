@@ -63,6 +63,8 @@ namespace REPEL
                             else Console.WriteLine("=> " + result);
                         }
                     }
+
+                    break;
                 }
                 catch (Exception e) { Console.WriteLine("E> " + e.Message); }
             }

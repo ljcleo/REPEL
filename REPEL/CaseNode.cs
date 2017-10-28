@@ -17,6 +17,8 @@ namespace REPEL
             return builder.Append(")").ToString();
         }
 
+        public override void Lookup(Symbols sym) => base.Lookup(sym, true);
+
         public override object Evaluate(Environment env)
         {
             Environment inner = new Environment(InnerSymbol.Count, env);
@@ -25,7 +27,7 @@ namespace REPEL
             if (InnerSymbol.Contains("_"))
             {
                 int index = InnerSymbol["_"];
-                env.SetValue(0, index, left);
+                inner.SetValue(0, index, left);
             }
 
             foreach (var node in this)
@@ -35,7 +37,11 @@ namespace REPEL
                 GuardNode guard = node as GuardNode;
                 if (guard == null) throw new InternalException("bad guard");
 
-                if (guard.EvaluateCondition(inner, left)) guard.Evaluate(inner);
+                if (guard.EvaluateCondition(inner, left))
+                {
+                    guard.Evaluate(inner);
+                    break;
+                }
             }
 
             return Atom.AtomNull;

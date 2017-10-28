@@ -54,9 +54,14 @@ namespace REPEL
         public override void Lookup(Symbols sym)
         {
             string current = (Operator as ASTLeaf).Token.Text;
-            if (current[0] == '=')
+            if (_normalOperator.ContainsKey(current))
             {
-                if (current != "=" && (current == string.Empty || _normalOperator.ContainsKey(current.Substring(0)))) throw new InternalException("bad assign operator parsed");
+                Left.Lookup(sym);
+                Right.Lookup(sym);
+            }
+            else if (current.EndsWith("="))
+            {
+                if (current != "=" && !_normalOperator.ContainsKey(current.Remove(current.Length - 1))) throw new InternalException("bad assign operator parsed");
 
                 FactorNode leftFactor = Left as FactorNode;
                 if (leftFactor == null || !leftFactor.IsAssignable) throw new InterpretException("left part not assignable");
@@ -64,11 +69,7 @@ namespace REPEL
                 leftFactor.AssignLookup(sym);
                 Right.Lookup(sym);
             }
-            else
-            {
-                Left.Lookup(sym);
-                Right.Lookup(sym);
-            }
+            else throw new InternalException("operator '" + current + "' has not been implemented");
         }
 
         public override object Evaluate(Environment env)
@@ -77,14 +78,18 @@ namespace REPEL
 
             string current = (Operator as ASTLeaf).Token.Text;
             if (_normalOperator.ContainsKey(current)) return _normalOperator[current](Left.Evaluate(env), Right.Evaluate(env));
-            else if (current[current.Length - 1] == '=')
+            else if (current.EndsWith("="))
             {
                 FactorNode leftFactor = Left as FactorNode;
                 if (leftFactor == null || !leftFactor.IsAssignable) throw new InterpretException("left part not assignable");
 
                 object rightValue = null;
                 if (current == "=") rightValue = Right.Evaluate(env);
-                else if (current.Length > 2 && _normalOperator.ContainsKey(current.Substring(0, current.Length - 1))) rightValue = _normalOperator[current.Substring(0, current.Length - 1)](Left.Evaluate(env), Right.Evaluate(env));
+                else if (current.Length >= 2)
+                {
+                    string op = current.Remove(current.Length - 1);
+                    if (_normalOperator.ContainsKey(op)) rightValue = _normalOperator[op](Left.Evaluate(env), Right.Evaluate(env));
+                }
 
                 if (rightValue == null) throw new InternalException("bad assign operator parsed");
                 leftFactor.AssignEvaluate(env, rightValue);

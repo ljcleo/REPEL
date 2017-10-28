@@ -23,7 +23,7 @@ namespace REPEL
                 GuardNode guard = node as GuardNode;
                 if (guard == null) throw new InternalException("bad guard");
 
-                if (guard.EvaluateCondition(env, null))
+                if (guard.EvaluateCondition(inner, null))
                 {
                     guard.Evaluate(inner);
                     break;
