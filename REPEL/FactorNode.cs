@@ -15,6 +15,12 @@ namespace REPEL
             { "~", Reverse }
         };
 
+        private static readonly Dictionary<string, Func<object, object>> _selfPrefix = new Dictionary<string, Func<object, object>>()
+        {
+            { "++", Increase },
+            { "--", Decrease }
+        };
+
         private static readonly Dictionary<string, int> _variablePrefix = new Dictionary<string, int>()
         {
             { "@", 1 },
@@ -44,8 +50,7 @@ namespace REPEL
             
             if (HasVariablePrefix)
             {
-                PrimaryNode primary = Operand as PrimaryNode;
-                if (primary != null) primary.Lookup(sym, _variablePrefix[(Prefix(0) as ASTLeaf).Token.Text]);
+                if (Operand is PrimaryNode primary) primary.Lookup(sym, _variablePrefix[(Prefix(0) as ASTLeaf).Token.Text]);
                 else throw new InternalException("factors must follow primary");
             }
             else Operand.Lookup(sym);
@@ -55,8 +60,7 @@ namespace REPEL
         {
             if (!IsAssignable) throw new InterpretException("factor not assignable");
 
-            PrimaryNode primary = Operand as PrimaryNode;
-            if (primary != null) primary.AssignLookup(sym, HasVariablePrefix ? _variablePrefix[(Prefix(0) as ASTLeaf).Token.Text] : 0);
+            if (Operand is PrimaryNode primary) primary.AssignLookup(sym, HasVariablePrefix ? _variablePrefix[(Prefix(0) as ASTLeaf).Token.Text] : 0);
             else throw new InternalException("factors must follow primary");
         }
 
@@ -65,12 +69,31 @@ namespace REPEL
             if (env == null) throw new ArgumentNullException(nameof(env));
 
             object result = Operand.Evaluate(env);
+            int type = 0;
 
             for (int i = 0; i < Count - 1; i++)
             {
                 string current = (Prefix(i) as ASTLeaf).Token.Text;
+
+                if (type == 0)
+                {
+                    if (_variablePrefix.ContainsKey(current)) continue;
+                    else type = 1;
+                }
+
+                if (type == 1)
+                {
+                    if (_selfPrefix.ContainsKey(current))
+                    {
+                        if (!(Operand as PrimaryNode).IsAssignable) throw new InterpretException("can only use self-changing prefix before assignable factor or primary");
+                        (Operand as PrimaryNode).AssignEvaluate(env, result = _selfPrefix[current](result));
+                        continue;
+                    }
+                    else type = 2;
+                }
+
                 if (_normalPrefix.ContainsKey(current)) result = _normalPrefix[current](result);
-                else throw new InternalException("prefix '" + current + "' has not been implemented");
+                else throw new InternalException("prefix '" + current + "' is used illegally");
             }
 
             return result;
@@ -80,8 +103,7 @@ namespace REPEL
         {
             if (!IsAssignable) throw new InterpretException("factor not assignable");
 
-            PrimaryNode primary = Operand as PrimaryNode;
-            if (primary != null) primary.AssignEvaluate(env, value);
+            if (Operand is PrimaryNode primary) primary.AssignEvaluate(env, value);
             else throw new InternalException("factors must follow primary");
         }
 
@@ -89,8 +111,8 @@ namespace REPEL
         {
             if (obj == null) throw new ArgumentNullException(nameof(obj));
 
-            if (obj is long) return +(obj as long?);
-            else if (obj is double) return +(obj as double?);
+            if (obj is long) return +(obj as long?).Value;
+            else if (obj is double) return +(obj as double?).Value;
             else throw new InterpretException("bad type for '+'");
         }
 
@@ -98,8 +120,8 @@ namespace REPEL
         {
             if (obj == null) throw new ArgumentNullException(nameof(obj));
 
-            if (obj is long) return -(obj as long?);
-            else if (obj is double) return -(obj as double?);
+            if (obj is long) return -(obj as long?).Value;
+            else if (obj is double) return -(obj as double?).Value;
             else throw new InterpretException("bad type for '+'");
         }
 
@@ -113,8 +135,24 @@ namespace REPEL
         {
             if (obj == null) throw new ArgumentNullException(nameof(obj));
 
-            if (obj is long) return ~(obj as long?);
+            if (obj is long) return ~(obj as long?).Value;
             else throw new InterpretException("bad type for '~'");
+        }
+
+        private static object Increase(object obj)
+        {
+            if (obj == null) throw new ArgumentNullException(nameof(obj));
+
+            if (obj is long) return (obj as long?).Value + 1;
+            else throw new InterpretException("bad type for '++'");
+        }
+
+        private static object Decrease(object obj)
+        {
+            if (obj == null) throw new ArgumentNullException(nameof(obj));
+
+            if (obj is long) return (obj as long?).Value - 1;
+            else throw new InterpretException("bad type for '--'");
         }
     }
 }
