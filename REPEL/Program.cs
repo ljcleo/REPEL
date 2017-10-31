@@ -15,6 +15,10 @@ namespace REPEL
             Parser parser = new Parser(lexer);
 
             GlobalEnvironment env = new GlobalEnvironment();
+            env.SetNewValue("true", Atom.AtomTrue);
+            env.SetNewValue("false", Atom.AtomFalse);
+            env.SetNewValue("null", Atom.AtomNull);
+
             //SyntaticAnalyze(lexer, parser);
             Interpret(lexer, parser, env);
 

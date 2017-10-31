@@ -259,7 +259,21 @@ namespace REPEL
             if (IsNext(lexer, "break", skip: true)) return new ControlNode(new Collection<IASTNode>() { new NullNode(new Collection<IASTNode>()) }, 0);
             else if (IsNext(lexer, "continue", skip: true)) return new ControlNode(new Collection<IASTNode>() { new NullNode(new Collection<IASTNode>()) }, 1);
             else if (IsNext(lexer, "return", skip: true)) return IsNext(lexer, _ending) || IsNext(lexer, "..") ? new ControlNode(new Collection<IASTNode>() { new NullNode(new Collection<IASTNode>()) }, 2) : new ControlNode(new Collection<IASTNode>() { Expression(lexer) }, 2);
+            else if (IsNext(lexer, "atom", skip: true)) return AtomDeclaration(lexer);
             else return Expression(lexer);
+        }
+
+        private static IASTNode AtomDeclaration(Lexer lexer)
+        {
+            Collection<IASTNode> atoms = new Collection<IASTNode>();
+
+            for (Skip(lexer, "("); !IsNext(lexer, ")", skip: true); )
+            {
+                atoms.Add(Name(lexer));
+                if (!IsNext(lexer, ")")) Skip(lexer, ",");
+            }
+
+            return new AtomDeclarationNode(atoms);
         }
 
         private static IASTNode Expression(Lexer lexer)

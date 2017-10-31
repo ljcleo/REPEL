@@ -22,7 +22,7 @@ namespace REPEL
 
         public Location GetLocation(int type, string name) => type == 0 ? GetLocation(name) : type == 1 ? GetGlobalLocation(name) : type == 2 ? GetLocalLocation(name) : throw new InternalException("bad variable type");
 
-        public int AddSymbol(string name) => Contains(name) ? Insert(name) : this[name];
+        public int AddSymbol(string name) => Contains(name) ? this[name] : Insert(name);
 
         public Location SetSymbol(int type, string name) => type == 0 ? SetSymbol(name) : type == 1 ? SetGlobalSymbol(name) : SetLocalSymbol(name);
 
