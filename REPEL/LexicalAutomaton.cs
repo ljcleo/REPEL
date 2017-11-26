@@ -301,7 +301,7 @@ namespace REPEL
             }
 
             builder.Remove(0, 1);
-            return new NameToken(currentLine, '\'' + name.ToString() + '\'');
+            return new NameToken(currentLine, name.ToString());
         }
 
         private static Token MatchWord(StringBuilder builder, int currentLine)
